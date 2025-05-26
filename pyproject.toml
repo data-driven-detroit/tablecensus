@@ -1,0 +1,28 @@
+[build-system]
+requires = ["hatchling>=1.9"]
+build-backend = "hatchling.build"
+
+[project]
+name = "tablecensus"
+version = "0.2.2"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "aiohttp>=3.12.0",
+    "click>=8.2.1",
+    "jinja2>=3.1.6",
+    "openpyxl>=3.1.5",
+    "pandas>=2.2.3",
+]
+
+[project.scripts]
+tablecensus="tablecensus:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["tablecensus"]                   # <-- path to the real package
+include  = ["tablecensus/templates/**"]      # txt/xlsx etc.
+
+[tool.hatch.build.targets.sdist]             # keep sdists identical
+packages = ["tablecensus/"]
+include  = ["tablecensus/templates/**"]
