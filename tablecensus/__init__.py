@@ -24,7 +24,6 @@ def main():
 @click.argument(
     "destination", 
     type=click.Path(file_okay=False, dir_okay=True, path_type=Path), default=".",
-    help="The folder where you'd like to create a new data dictionary"
 )
 def start(destination):
     path = destination / f"data_dictionary_{TODAY}.xlsx"
@@ -40,12 +39,10 @@ def start(destination):
 @main.command()
 @click.argument(
     "dictionary_path",
-    help="The data dictionary file that you'd like to assemble into a dataset."
 )
 @click.argument(
     "output_path", 
     default=f"report_{TODAY}.xlsx",
-    help="The output file where you'd like the report to be saved."
 )
 def assemble(dictionary_path, output_path):
     # TODO -- this is great for a cli, but I NEED to be callable from code as well
