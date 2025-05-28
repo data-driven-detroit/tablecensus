@@ -26,12 +26,12 @@ def assemble_from(dictionary_path):
     
     grouped_responses = []
     # Group by label for east-west grouping
-    for label, group in groupby(responses, key=lambda r: r[0]):
+    for label, (_, group) in groupby(responses, key=lambda r: r[0]):
         grouped_responses.append(
             (
                 label,
                 pd.concat(
-                    (frame.set_index("GEO_ID") for _, frame in group)
+                    (frame.set_index("GEO_ID") for frame in group)
                 )
             )
         )
