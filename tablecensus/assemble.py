@@ -37,7 +37,7 @@ def assemble_from(dictionary_path):
 
             frame = (
                 pd.DataFrame(rows, columns=columns)[["GEO_ID", "NAME", *active_cols]]
-                .set_index("GEO_ID")
+                .set_index(["GEO_ID", "NAME"])
             )
             variable_batches.append(frame)
 
