@@ -44,7 +44,7 @@ def assemble_from(dictionary_path):
             namespace.eval(variable["calculation"]).rename(variable["name"])
         )
 
-    final = (
+    return (
         pd.concat(result, axis=1)
         .rename(columns={"GEO_ID": "geoid", "NAME": "Geography Name"})
     )
