@@ -36,9 +36,8 @@ def assemble_from(dictionary_path):
             active_cols = [c for c in columns if c in rename]
 
             frame = (
-                pd.DataFrame(rows, columns=columns).set_index("GEO_ID")[
-                    ["GEO_ID", "NAME", *active_cols]
-                ]
+                pd.DataFrame(rows, columns=columns)[["GEO_ID", "NAME", *active_cols]]
+                .set_index("GEO_ID")
             )
             variable_batches.append(frame)
 
