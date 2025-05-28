@@ -26,10 +26,10 @@ def assemble_from(dictionary_path):
     
     grouped_responses = []
     # Group by label for east-west concatenation
-    for label, (_, group) in groupby(responses, key=lambda r: r[0]):
+    for label, group in groupby(responses, key=lambda r: r[0]):
         
         variable_batches = []
-        for frame in group:
+        for _, frame in group:
             columns, *row = group
             frame = pd.DataFrame(row, columns=columns).set_index("GEO_ID")
             variable_batches.append(frame)
