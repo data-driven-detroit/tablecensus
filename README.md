@@ -17,6 +17,7 @@ Defining ACS data pulls with data dictionaries, then the data work is automatic.
 uv tool install git+https://github.com/data-driven-detroit/tablecensus.git
 ```
 
+
 ## Upgrade
 
 Periodically you should check for updates on the tool:
@@ -30,3 +31,4 @@ Or if it's easier you can update all your uv-installed tools.
 ```
 uv tool update --all
 ```
+
