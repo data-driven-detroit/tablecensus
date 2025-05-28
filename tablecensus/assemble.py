@@ -31,7 +31,11 @@ def assemble_from(dictionary_path):
         variable_batches = []
         for _, data in group:
             columns, *rows = data
-            frame = pd.DataFrame(rows, columns=columns).set_index("GEO_ID")
+            frame = (
+                pd.DataFrame(rows, columns=columns).set_index("GEO_ID")[
+                    ["GEO_ID", "NAME", *list(rename.values())]
+                ]
+            )
             variable_batches.append(frame)
 
         grouped_responses.append(
