@@ -24,6 +24,7 @@ def assemble_from(dictionary_path):
     calls = build_calls(geo_parts, variable_codes, releases)
     responses = populate_data(calls)
     
+
     grouped_responses = []
     # Group by label for east-west concatenation
     for label, group in groupby(responses, key=lambda r: r[0]):
@@ -31,9 +32,12 @@ def assemble_from(dictionary_path):
         variable_batches = []
         for _, data in group:
             columns, *rows = data
+
+            active_cols = [c for c in columns if c in rename]
+
             frame = (
                 pd.DataFrame(rows, columns=columns).set_index("GEO_ID")[
-                    ["GEO_ID", "NAME", *list(rename.values())]
+                    ["GEO_ID", "NAME", *active_cols]
                 ]
             )
             variable_batches.append(frame)
