@@ -1,3 +1,4 @@
+from itertools import groupby
 import pandas as pd
 
 from .variables import create_renamer
@@ -23,9 +24,21 @@ def assemble_from(dictionary_path):
     calls = build_calls(geo_parts, variable_codes, releases)
     responses = populate_data(calls)
     
+    grouped_responses = []
+    # Group by label for east-west grouping
+    for label, group in groupby(responses, key=lambda r: r[0]):
+        grouped_responses.append(
+            (
+                label,
+                pd.concat(
+                    (frame.set_index("GEO_ID") for frame in group)
+                )
+            )
+        )
+
     result = []
-    for response in responses:
-        (year, release), data = response
+    for response in grouped_responses:
+        (_, year, release), data = response # skip the geo stuff
         columns, *row = data
         
         frame = (
@@ -35,6 +48,9 @@ def assemble_from(dictionary_path):
             .assign(Year=year, Release=release)
         )
         result.append(frame)
+    
+    if not result:
+        raise ValueError("Nothing was returned from API, check variable and geography definitions.")
 
     namespace = pd.concat(result).reset_index(drop=True)
 

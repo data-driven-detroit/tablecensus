@@ -21,7 +21,7 @@ def build_calls(geo_parts, variables, releases):
 
     return [
         (
-            (year, release),
+            (geo_part, year, release),
             template.format(
                 vars_str=",".join(vars_str),
                 geo_part=geo_part,
