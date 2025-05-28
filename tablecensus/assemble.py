@@ -25,18 +25,22 @@ def assemble_from(dictionary_path):
     responses = populate_data(calls)
     
     grouped_responses = []
-    # Group by label for east-west grouping
+    # Group by label for east-west concatenation
     for label, (_, group) in groupby(responses, key=lambda r: r[0]):
+        
+        variable_batches = []
+        for frame in group:
+            columns, *row = group
+            frame = pd.DataFrame(row, columns=columns).set_index("GEO_ID")
+            variable_batches.append(frame)
+
         grouped_responses.append(
-            (
-                label,
-                pd.concat(
-                    (frame.set_index("GEO_ID") for frame in group)
-                )
-            )
+            (label, pd.concat(variable_batches, axis=1).reset_index())
         )
 
+
     result = []
+    # North-south concatenation for different geos / years
     for response in grouped_responses:
         (_, year, release), data = response # skip the geo stuff
         columns, *row = data
