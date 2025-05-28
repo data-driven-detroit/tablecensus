@@ -31,7 +31,7 @@ def assemble_from(dictionary_path):
             (
                 label,
                 pd.concat(
-                    (frame.set_index("GEO_ID") for frame in group)
+                    (frame.set_index("GEO_ID") for _, frame in group)
                 )
             )
         )
