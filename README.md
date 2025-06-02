@@ -17,6 +17,15 @@ Defining ACS data pulls with data dictionaries, then the data work is automatic.
 uv tool install git+https://github.com/data-driven-detroit/tablecensus.git
 ```
 
+### Mac Users
+
+Users on MAC have to run an additional command to make sure the requests are sent correctly:
+
+```
+/Applications/Python\ 3.12/Install\ Certificates.command
+```
+
+Change the version if you're not running python 3.12 run ```python3 -V``` if you're not sure.
 
 ## Upgrade
 
