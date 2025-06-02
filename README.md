@@ -6,8 +6,18 @@ Defining ACS data pulls with data dictionaries, then the data work is automatic.
 ## Commands
 
 `start`
+
+To start working with table census you need to create a data dictionary that the tool will read to assemble your data pull. To create this table, use `tablecensus start`.
+
+This will create a file in the working folder 'data_dictionary_<today's date>.xlsx.' This is the file that you'll use to define your datapull.
+
 `assemble`
 
+Once you've finished editing the data dictionary, you can run `tablecensus assemble <data dictionary filename>` and it will pull from the API and return a file 'report_<today's date>.xlsx'.
+
+## How the data dictionary works
+
+*Explanation to come but iykyk*
 
 ## Installation
 
