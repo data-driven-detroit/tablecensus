@@ -20,9 +20,10 @@ Once you've finished editing the data dictionary, you can run `tablecensus assem
 *Explanation to come but iykyk*
 
 ## Installation
-
-1. If you haven't already, first install `uv` [following these instructions](https://docs.astral.sh/uv/getting-started/installation/#__tabbed_1_1).
-2. Then install tablecensus on your console with:
+1. You'll need to install git, if you haven't already [following the instructions for your operating system](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
+  - **For Windows users**, using this Git package is okay: https://git-scm.com/download/win 
+2. Install the package manager `uv` [following these instructions](https://docs.astral.sh/uv/getting-started/installation/#__tabbed_1_1).
+3. Then install tablecensus on your console with:
 ```bash
 uv tool install git+https://github.com/data-driven-detroit/tablecensus.git
 ```
