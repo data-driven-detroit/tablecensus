@@ -28,7 +28,7 @@ def start(destination):
     with as_file(tmpl) as src_path:
         shutil.copyfile(src_path, path)
 
-    print(f"Created a new data dictionary at f{path}")
+    print(f"Created a new data dictionary at {path}")
 
 
 @main.command()
