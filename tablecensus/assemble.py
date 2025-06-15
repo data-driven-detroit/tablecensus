@@ -23,7 +23,6 @@ def assemble_from(dictionary_path):
     
     calls = build_calls(geo_parts, variable_codes, releases)
     responses = populate_data(calls)
-    
 
     grouped_responses = []
     # Group by label for east-west concatenation
@@ -53,7 +52,7 @@ def assemble_from(dictionary_path):
         frame = (
             data
             .rename(columns=rename)
-            .astype({var: pd.Int64Dtype() for var in rename.values()})
+            # .astype({var: pd.Int64Dtype() for var in rename.values()})
             .assign(Year=year, Release=release)
         )
         result.append(frame)
