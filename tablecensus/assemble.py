@@ -25,10 +25,13 @@ def assemble_from(dictionary_path):
 
     # The calls are broken up by year and head of geography tree
     responses = populate_data(calls)
+    
+
+    grp_key = lambda r: r[0]
 
     grouped_responses = []
     # Group by label for east-west concatenation
-    for label, group in groupby(responses, key=lambda r: r[0]):
+    for label, group in groupby(sorted(responses, key=grp_key), key=grp_key):
         
         variable_batches = []
         for _, data in group:
