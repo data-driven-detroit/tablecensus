@@ -22,6 +22,8 @@ def assemble_from(dictionary_path):
     variable_codes = list(rename.keys())
     
     calls = build_calls(geo_parts, variable_codes, releases)
+
+    # The calls are broken up by year and head of geography tree
     responses = populate_data(calls)
 
     grouped_responses = []
@@ -33,14 +35,16 @@ def assemble_from(dictionary_path):
             columns, *rows = data
 
             active_cols = [c for c in columns if c in rename]
-            active_cols.append("GEO_ID")
+            header = active_cols
+            header.append("GEO_ID")
 
             if not variable_batches:
                 # Include the name of the first group
-                active_cols.append("NAME")
+                header.append("NAME")
 
             frame = (
-                pd.DataFrame(rows, columns=columns)[active_cols]
+                pd.DataFrame(rows, columns=columns)[header]
+                .astype({var: pd.Float64Dtype() for var in active_cols})
                 .set_index(["GEO_ID"])
             )
 
