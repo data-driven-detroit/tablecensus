@@ -5,8 +5,12 @@ import pandas as pd
 
 
 def extract_names(expr: str) -> set[str]:
-    tree = ast.parse(expr, mode="eval")
-    return {node.id for node in ast.walk(tree) if isinstance(node, ast.Name)}
+    try:
+        tree = ast.parse(expr, mode="eval")
+        return {node.id for node in ast.walk(tree) if isinstance(node, ast.Name)}
+    except TypeError:
+        print("At least one variable is improperly defined. Review 'Variables' tab in datadictionary file. Skipping for now.")
+        return set()
 
 
 def collect_variables(variables: pd.DataFrame) -> set:
