@@ -102,7 +102,7 @@ def create_consolodated_api_calls(tree: defaultdict):
                 )
 
             case frozenset():
-                child_str = ",".join([child.identity for child in set(children)])
+                child_str = ",".join({child.identity for child in children})
                 ingeos = "%20".join(
                     f"{quote(API_GEO_PARAMS[key])}:{val}"
                     for key, val in parents
