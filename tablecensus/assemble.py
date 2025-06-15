@@ -33,11 +33,17 @@ def assemble_from(dictionary_path):
             columns, *rows = data
 
             active_cols = [c for c in columns if c in rename]
+            active_cols.append("GEO_ID")
+
+            if not variable_batches:
+                # Include the name of the first group
+                active_cols.append("NAME")
 
             frame = (
-                pd.DataFrame(rows, columns=columns)[["GEO_ID", "NAME", *active_cols]]
-                .set_index(["GEO_ID", "NAME"])
+                pd.DataFrame(rows, columns=columns)[active_cols]
+                .set_index(["GEO_ID"])
             )
+
             variable_batches.append(frame)
 
         grouped_responses.append(
@@ -52,7 +58,6 @@ def assemble_from(dictionary_path):
         frame = (
             data
             .rename(columns=rename)
-            # .astype({var: pd.Int64Dtype() for var in rename.values()})
             .assign(Year=year, Release=release)
         )
         result.append(frame)
