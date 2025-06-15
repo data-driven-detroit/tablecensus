@@ -44,6 +44,15 @@ def assemble(dictionary_path, output_path):
     print(f"Assembling data from dictionary {dictionary_path} and saving to {output_path}")
     
     final = assemble_from(dictionary_path)
+    
+    path = Path(output_path)
 
-    apply_d3_style(final).to_excel(output_path, index=False)
+    if path.suffix == ".xlsx":
+        apply_d3_style(final).to_excel(output_path, index=False)
+
+    elif path.suffix == ".csv":
+        final.to_csv(output_path, index=False)
+
+    elif path.suffix == ".parquet":
+        final.to_parquet(path, index=False)
 
