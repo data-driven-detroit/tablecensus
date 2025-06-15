@@ -35,7 +35,7 @@ def assemble_from(dictionary_path):
             columns, *rows = data
 
             active_cols = [c for c in columns if c in rename]
-            header = active_cols
+            header = active_cols.copy()
             header.append("GEO_ID")
 
             if not variable_batches:
