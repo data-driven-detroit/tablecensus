@@ -7,7 +7,13 @@ from .request_prep import build_calls
 from .request_manager import populate_data
 
 
-def assemble_from(dictionary_path):
+def shorten_geoid(geoid: str):
+    # 1400000US26163511400 -> 14000US26163511400
+
+    return geoid[:5] + geoid[7:]
+
+
+def assemble_from(dictionary_path, short_geoids=False):
     variables = pd.read_excel(dictionary_path, sheet_name="Variables")
     geographies = pd.read_excel(
         dictionary_path, sheet_name="Geographies", dtype="string"
@@ -82,5 +88,5 @@ def assemble_from(dictionary_path):
 
     return (
         pd.concat(result, axis=1)
-        .rename(columns={"GEO_ID": "geoid", "NAME": "Geography Name"})
+        .rename(columns={"GEO_ID": "geoid", "NAME": "geoname"})
     )

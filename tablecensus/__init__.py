@@ -39,11 +39,16 @@ def start(destination):
     "output_path", 
     default=f"report_{TODAY}.xlsx",
 )
-def assemble(dictionary_path, output_path):
+@click.option(
+    "-s",
+    "--short-geoids",
+    default=False
+)
+def assemble(dictionary_path, output_path, short_geoids):
     # TODO -- this is great for a cli, but I NEED to be callable from code as well
     print(f"Assembling data from dictionary {dictionary_path} and saving to {output_path}")
     
-    final = assemble_from(dictionary_path)
+    final = assemble_from(dictionary_path, short_geoids)
     
     path = Path(output_path)
 
