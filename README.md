@@ -1,7 +1,6 @@
 # tablecensus
 
-Defining ACS data pulls with data dictionaries, then the data work is automatic.
-
+Define American Community Survey data pulls with spreadsheet-based data dictionaries, then the data work is automatic.
 
 ## Commands
 
@@ -9,15 +8,29 @@ Defining ACS data pulls with data dictionaries, then the data work is automatic.
 
 To start working with table census you need to create a data dictionary that the tool will read to assemble your data pull. To create this table, use `tablecensus start`.
 
-This will create a file in the working folder 'data_dictionary_<today's date>.xlsx.' This is the file that you'll use to define your datapull.
+This will create a file in the working folder `data_dictionary_<today's date>.xlsx.` This is the file that you'll use to define your datapull.
 
 `assemble`
 
-Once you've finished editing the data dictionary, you can run `tablecensus assemble <data dictionary filename>` and it will pull from the API and return a file 'report_<today's date>.xlsx'.
+Once you've finished editing the data dictionary, you can run `tablecensus assemble <data dictionary filename>` and it will pull from the API and return a file `report_<today's date>.xlsx`.
+
+### Short geoids: 
+
+`assemble` has the flag `-s` or `--short-geoids` which will return shorter geoids to interoperate with the datasets that use them. For example, the `GEO_ID` field returns a 21-character normally, but some tools like [censusreporter](censusreporter.org) and [IPUMS NHGIS](https://www.nhgis.org/) use shorter geoids.
+
 
 ## How the data dictionary works
 
-*Explanation to come but iykyk*
+Define variables and select geographies in the `data_dictionary_<date>.xlsx` file created by the command `tablecensus start`.
+Then you can run `tablecensus assemble <this filename>.xlsx` to turn these definitions into a report.
+
+Variables: give each variable a name and use ACS codes to write out the calculation for that name. Basic arithmetic works 
+
+Years: choose which year(s) you'd like the data pulled for and which release (i.e. 1-year, 5-year)
+
+Geographies: select the geographies that you'd like to pull the data for, and fill in the correct geoid components. '*' will select all geographies that have the parent components, following the ACS API matching rules.
+
+Available Releases, Variable Library, and Geography Library tabs are available as references to aid you in filling in the other tabs.
 
 ## Installation
 1. You'll need to install git, if you haven't already [following the instructions for your operating system](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
@@ -37,6 +50,7 @@ Users on MAC have to run an additional command to make sure the requests are sen
 ```
 
 Change the version if you're not running python 3.12 run ```python3 -V``` if you're not sure.
+
 
 ## Upgrade
 
