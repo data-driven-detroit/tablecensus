@@ -80,6 +80,10 @@ def assemble_from(dictionary_path, short_geoids=False):
 
     namespace = pd.concat(result).reset_index(drop=True)
 
+    # Shorten the geoids if that's what the user would like
+    if short_geoids:
+        namespace["GEO_ID"]  = namespace["GEO_ID"].apply(shorten_geoid)
+
     result = [namespace["GEO_ID"], namespace["NAME"], namespace["Year"], namespace["Release"]]
     for _, variable in variables.iterrows():
         result.append(
