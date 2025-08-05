@@ -42,7 +42,7 @@ def start(destination):
 @click.option(
     "-s",
     "--short-geoids",
-    default=False
+    is_flag=True,
 )
 def assemble(dictionary_path, output_path, short_geoids):
     # TODO -- this is great for a cli, but I NEED to be callable from code as well
