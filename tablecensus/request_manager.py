@@ -9,24 +9,27 @@ async def make_request(
     request: tuple[Any, str], session: ClientSession, pbar: tqdm
 ):
     label, url = request
-    async with session.get(url, timeout=10) as r:
-        r.raise_for_status()
-        data = await r.json()
-        pbar.update(1)
+    try:
+        async with session.get(url, timeout=10) as r:
+            r.raise_for_status()
+            data = await r.json()
+            pbar.update(1)
 
-        return (label, data)
+            return ("success", label, data)
+    except Exception as e:
+        pbar.update(1)
+        return ("error", url, e)
 
 
 async def manage_requests(requests: list[tuple[Any, str]]):
     with tqdm(total=len(requests), desc="Assembling table") as pbar:
         async with ClientSession() as session:
             results = await asyncio.gather(
-                *(make_request(request, session, pbar) for request in requests),
-                return_exceptions=True
+                *(make_request(request, session, pbar) for request in requests)
             )
 
-    ok = [r for r in results if not isinstance(r, Exception)]
-    errors = [e for e in results if isinstance(e, Exception)]
+    ok = [(label, data) for status, label, data in results if status == "success"]
+    errors = [(url, error) for status, url, error in results if status == "error"]
 
     return ok, errors
 
@@ -34,7 +37,7 @@ async def manage_requests(requests: list[tuple[Any, str]]):
 def populate_data(requests):
     ok, errors = asyncio.run(manage_requests(requests))
 
-    for error in errors:
-        print(error)
+    for url, error in errors:
+        print(f"Request failed for URL: {url} - {error}")
     
     return ok
