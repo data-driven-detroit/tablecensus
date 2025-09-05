@@ -60,12 +60,16 @@ def create_geography_from_parts(parts):
         )
 
     except KeyError:
+        available_parts = list(STRING_NAME_TRANSLATION.keys())
         raise ValueError(
-            f"The components you provided, {', '.join(parts.keys())}, are not "
-            "valid geography parts or don't constitute a complete census "
-            "geography specification. See "
-            "https://www.census.gov/programs-surveys/geography/guidance/geo-identifiers.html"
-            " for more information, or check the d3census docs."
+            f"❌ Invalid geography combination: {', '.join(parts.keys())}\n\n"
+            f"Valid geography parts are: {', '.join(available_parts)}\n\n"
+            "Common geography combinations:\n"
+            "  • state: 26 (Michigan)\n"
+            "  • state + county: 26, 163 (Wayne County, Michigan)\n"
+            "  • state + county + tract: 26, 163, 123456\n"
+            "  • state + place: 26, 22000 (Detroit city)\n\n"
+            "See: https://www.census.gov/programs-surveys/geography/guidance/geo-identifiers.html"
         )
 
 
@@ -126,11 +130,33 @@ def match_geo(row):
 
 
 def build_api_geo_parts(geographies):
-    return create_consolodated_api_calls(
-        consolidate_calls(
-            geographies
-            .apply(match_geo, axis=1)
-            .apply(create_geography_from_parts)
-            .values
-        )
-    )
+    try:
+        matched_geos = geographies.apply(match_geo, axis=1)
+        if matched_geos.empty or all(not geo for geo in matched_geos):
+            raise ValueError(
+                "❌ No valid geographies found in Geographies sheet.\n"
+                "Make sure you have at least one row with valid geography codes."
+            )
+        
+        geography_objects = []
+        for i, geo_parts in enumerate(matched_geos):
+            if not geo_parts:  # Skip empty rows
+                continue
+            try:
+                geo_obj = create_geography_from_parts(geo_parts)
+                geography_objects.append(geo_obj)
+            except ValueError as e:
+                print(f"⚠️  Warning: Row {i+2} in Geographies sheet has invalid data: {e}")
+                continue
+        
+        if not geography_objects:
+            raise ValueError(
+                "❌ No valid geographies could be created from your Geographies sheet.\n"
+                "Check that your geography codes are valid and properly formatted."
+            )
+        
+        return create_consolodated_api_calls(consolidate_calls(geography_objects))
+    except Exception as e:
+        if "❌" in str(e):  # Re-raise our custom errors
+            raise
+        raise ValueError(f"❌ Error processing geographies: {e}")
