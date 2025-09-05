@@ -6,8 +6,8 @@ import numpy as np
 
 @dataclass(frozen=True, slots=True)
 class CensusValue:
-    estimate: float | int
-    error: float | int
+    estimate: float | int | None
+    error: float | int | None
     table: str | None = None
 
     def __add__(self, other):
@@ -65,57 +65,63 @@ class CensusValue:
 
     def __truediv__(self, other):
         # This should accept either numeric or censusvals
-        if isinstance(other, CensusValue):
-            estimate = self.estimate / other.estimate
-            
-            # If the estimates come from the same universe, the errors will be 
-            # correlated. The 
-            vsu = self.error**2 - (estimate * other.error)**2
-            vdu = self.error**2 + (estimate * other.error)**2
+        try:
+            if isinstance(other, CensusValue):
+                estimate = self.estimate / other.estimate
+                
+                # If the estimates come from the same universe, the errors will be 
+                # correlated. The 
+                vsu = self.error**2 - (estimate * other.error)**2
+                vdu = self.error**2 + (estimate * other.error)**2
 
-            if (self.table is not None) and (self.table == other.table) and (vsu > 0):
-                v = vsu
-            else:
-                v = vdu
-            
-            if self.table == other.table:
-                table = self.table
-            else:
-                table = None
+                if (self.table is not None) and (self.table == other.table) and (vsu > 0):
+                    v = vsu
+                else:
+                    v = vdu
+                
+                if self.table == other.table:
+                    table = self.table
+                else:
+                    table = None
 
-            error = (1 / other.estimate) * np.sqrt(v)
+                error = (1 / other.estimate) * np.sqrt(v)
 
-            return CensusValue(estimate, error, table)
+                return CensusValue(estimate, error, table)
 
-        if isinstance(other, numbers.Number):
-            return CensusValue(
-                self.estimate / other,
-                self.error / other,
-                self.table
-            )
+            if isinstance(other, numbers.Number):
+                return CensusValue(
+                    self.estimate / other,
+                    self.error / other,
+                    self.table
+                )
+        except ZeroDivisionError:
+            return CensusValue(None, None)
 
     def __rtruediv__(self, other):
         if isinstance(other, CensusValue):
-            estimate = other.estimate / self.estimate
-            
-            # If the estimates come from the same universe, the errors will be 
-            # correlated. The 
-            vsu = other.error**2 - (estimate * self.error)**2
-            vdu = other.error**2 + (estimate * self.error)**2
+            try:
+                estimate = other.estimate / self.estimate
+                
+                # If the estimates come from the same universe, the errors will be 
+                # correlated. The 
+                vsu = other.error**2 - (estimate * self.error)**2
+                vdu = other.error**2 + (estimate * self.error)**2
 
-            if (self.table is not None) and (self.table == other.table) and (vsu > 0):
-                v = vsu
-            else:
-                v = vdu
-            
-            if self.table == other.table:
-                table = self.table
-            else:
-                table = None
+                if (self.table is not None) and (self.table == other.table) and (vsu > 0):
+                    v = vsu
+                else:
+                    v = vdu
+                
+                if self.table == other.table:
+                    table = self.table
+                else:
+                    table = None
 
-            error = (1 / self.estimate) * np.sqrt(v)
+                error = (1 / self.estimate) * np.sqrt(v)
 
-            return CensusValue(estimate, error, table)
+                return CensusValue(estimate, error, table)
+            except:
+                return CensusValue(None, None)
 
         if isinstance(other, numbers.Number):
             return CensusValue(
