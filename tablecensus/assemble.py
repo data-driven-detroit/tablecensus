@@ -13,7 +13,7 @@ def shorten_geoid(geoid: str):
     return geoid[:5] + geoid[7:]
 
 
-def assemble_from(dictionary_path, short_geoids=False):
+def assemble_from(dictionary_path, short_geoids=False, dump_raw=False):
     try:
         variables = pd.read_excel(dictionary_path, sheet_name="Variables")
     except FileNotFoundError:
@@ -128,6 +128,11 @@ def assemble_from(dictionary_path, short_geoids=False):
         )
 
     raw_census = pd.concat(result).reset_index(drop=True)
+    
+    if dump_raw:
+        # Allow to dump the raw output for debugging
+        raw_census.to_csv("dumped_output")
+
     namespace = create_namespace(raw_census, variable_stems)
 
     # Shorten the geoids if that's what the user would like

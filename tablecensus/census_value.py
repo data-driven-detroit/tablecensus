@@ -3,7 +3,6 @@ import numbers
 import numpy as np
 
 
-
 @dataclass(frozen=True, slots=True)
 class CensusValue:
     estimate: float | int | None

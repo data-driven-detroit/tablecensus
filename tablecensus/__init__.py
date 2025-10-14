@@ -44,10 +44,15 @@ def start(destination):
     "--short-geoids",
     is_flag=True,
 )
-def assemble(dictionary_path, output_path, short_geoids):
+@click.option(
+    "-dr",
+    "--dump-raw",
+    is_flag=True,
+)
+def assemble(dictionary_path, output_path, short_geoids, dump_raw):
     print(f"Assembling data from dictionary {dictionary_path} and saving to {output_path}")
     
-    final = assemble_from(dictionary_path, short_geoids)
+    final = assemble_from(dictionary_path, short_geoids, dump_raw)
     path = Path(output_path)
 
     if path.suffix == ".xlsx":
