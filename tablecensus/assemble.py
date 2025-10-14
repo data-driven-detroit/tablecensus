@@ -16,11 +16,14 @@ def shorten_geoid(geoid: str):
 def assemble_from(dictionary_path, short_geoids=False, dump_raw=False):
     try:
         variables = pd.read_excel(dictionary_path, sheet_name="Variables")
+        assert len(set(variables["name"])) == len(variables["name"])
+
     except FileNotFoundError:
         raise FileNotFoundError(
             f"❌ Data dictionary file not found: {dictionary_path}\n"
             "Make sure the file path is correct and the file exists."
         )
+
     except ValueError as e:
         if "Variables" in str(e):
             raise ValueError(
@@ -28,6 +31,9 @@ def assemble_from(dictionary_path, short_geoids=False, dump_raw=False):
                 "Your data dictionary must have a 'Variables' sheet. Use 'tablecensus start' to create a proper template."
             )
         raise ValueError(f"❌ Error reading Variables sheet: {e}")
+
+    except AssertionError as e:
+        raise ValueError(f"❌ No repeated variable names allowed. Review your data dictionary and fix.")
     
     try:
         geographies = pd.read_excel(
