@@ -113,7 +113,6 @@ def unwrap_calculations(results: pd.DataFrame, variables: pd.DataFrame) -> pd.Da
     for col in results.columns:
         col_data = results[col]
         
-        float_dtypes = []
         # Check if this column contains CensusValue objects
         if len(col_data) > 0 and isinstance(col_data.iloc[0], CensusValue):
             # Extract estimates and errors
@@ -131,11 +130,9 @@ def unwrap_calculations(results: pd.DataFrame, variables: pd.DataFrame) -> pd.Da
             unwrapped_data[col] = estimates
             unwrapped_data[moe_col] = errors
 
-            float_dtypes.append(col)
-            float_dtypes.append(moe_col)
         else:
             # Non-CensusValue column, copy as-is
             unwrapped_data[col] = col_data
     
-    return pd.DataFrame(unwrapped_data, dtype={c: 'float' for c in float_dtypes})
+    return pd.DataFrame(unwrapped_data)
 
