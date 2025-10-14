@@ -113,6 +113,7 @@ def unwrap_calculations(results: pd.DataFrame, variables: pd.DataFrame) -> pd.Da
     for col in results.columns:
         col_data = results[col]
         
+        float_dtypes = []
         # Check if this column contains CensusValue objects
         if len(col_data) > 0 and isinstance(col_data.iloc[0], CensusValue):
             # Extract estimates and errors
@@ -122,16 +123,19 @@ def unwrap_calculations(results: pd.DataFrame, variables: pd.DataFrame) -> pd.Da
             # Determine MOE column naming convention based on variable name
             if '_' in col or col.islower():
                 # snake_case pattern - append '_moe'
-                moe_col_name = f"{col}_moe"
+                moe_col = f"{col}_moe"
             else:
                 # readable pattern - append ' MOE'
-                moe_col_name = f"{col} MOE"
+                moe_col = f"{col} MOE"
             
             unwrapped_data[col] = estimates
-            unwrapped_data[moe_col_name] = errors
+            unwrapped_data[moe_col] = errors
+
+            float_dtypes.append(col)
+            float_dtypes.append(moe_col)
         else:
             # Non-CensusValue column, copy as-is
             unwrapped_data[col] = col_data
     
-    return pd.DataFrame(unwrapped_data)
+    return pd.DataFrame(unwrapped_data, dtype={c: 'float' for c in float_dtypes})
 
