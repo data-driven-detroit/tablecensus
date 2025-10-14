@@ -133,6 +133,9 @@ def unwrap_calculations(results: pd.DataFrame, variables: pd.DataFrame) -> pd.Da
         else:
             # Non-CensusValue column, copy as-is
             unwrapped_data[col] = col_data
-    
+        
+        with open("data_dump", "w") as f:
+            f.write(str(unwrapped_data))
+
     return pd.DataFrame.from_dict(unwrapped_data)
 
