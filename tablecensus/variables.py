@@ -134,5 +134,5 @@ def unwrap_calculations(results: pd.DataFrame, variables: pd.DataFrame) -> pd.Da
             # Non-CensusValue column, copy as-is
             unwrapped_data[col] = col_data
     
-    return pd.DataFrame(unwrapped_data)
+    return pd.DataFrame.from_dict(unwrapped_data)
 
