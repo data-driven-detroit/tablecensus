@@ -108,8 +108,6 @@ def unwrap_calculations(results: pd.DataFrame, variables: pd.DataFrame) -> pd.Da
     # "readable" -> append ' MOE'
     """
     unwrapped_data = {}
-    
-    print(results.columns)
 
     # Copy over non-CensusValue columns as-is
     for col in results.columns:
