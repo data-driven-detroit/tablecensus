@@ -1,5 +1,7 @@
 from itertools import product
 
+from .config import get_api_key
+
 
 MAX_VARS_PER_CALL = 25
 
@@ -17,7 +19,8 @@ def build_calls(geo_parts, variables, releases):
         "?get=GEO_ID,NAME,{vars_str}&{geo_part}{key_string}"
     )
 
-    key_string = ""
+    api_key = get_api_key()
+    key_string = f"&key={api_key}" if api_key else ""
 
     return [
         (

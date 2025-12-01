@@ -63,12 +63,31 @@ The template includes reference sheets with common variables and geography examp
 
 ## Installation
 1. You'll need to install git, if you haven't already [following the instructions for your operating system](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
-  - **For Windows users**, using this Git package is okay: https://git-scm.com/download/win 
+  - **For Windows users**, using this Git package is okay: https://git-scm.com/download/win
 2. Install the package manager `uv` [following these instructions](https://docs.astral.sh/uv/getting-started/installation/#__tabbed_1_1).
 3. Then install tablecensus on your console with:
 ```bash
 uv tool install git+https://github.com/data-driven-detroit/tablecensus.git
 ```
+
+## Configuration
+
+### Census API Key (Optional)
+
+While tablecensus works without an API key, using one provides higher rate limits from the Census Bureau. To configure your API key:
+
+1. [Request a free API key from the Census Bureau](https://api.census.gov/data/key_signup.html)
+2. Create the config directory and file:
+```bash
+mkdir -p ~/.config/tablecensus
+```
+3. Create a file at `~/.config/tablecensus/config.toml` with the following content:
+```toml
+[census]
+api_key = "your_api_key_here"
+```
+
+Replace `your_api_key_here` with your actual Census API key. Tablecensus will automatically use this key for all API requests.
 
 ### Mac Users
 
