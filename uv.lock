@@ -517,7 +517,7 @@ wheels = [
 
 [[package]]
 name = "tablecensus"
-version = "0.3.13"
+version = "0.3.14"
 source = { editable = "." }
 dependencies = [
     { name = "aiohttp" },
