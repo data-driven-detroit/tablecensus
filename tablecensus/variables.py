@@ -74,7 +74,17 @@ def wrap_census_values(raw_census: pd.DataFrame, v):
     error_col = f"{table}_{v[-3:]}M"
 
     def wrapper(row):
-        return CensusValue(row[estimate_col], row[error_col], table)
+        # Convert pd.NA/NaN to None for consistent handling
+        estimate = row[estimate_col]
+        error = row[error_col]
+
+        # Check for pandas NA, NaT, or numpy NaN
+        if pd.isna(estimate):
+            estimate = None
+        if pd.isna(error):
+            error = None
+
+        return CensusValue(estimate, error, table)
 
     return raw_census.apply(wrapper, axis=1)
 
