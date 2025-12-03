@@ -85,8 +85,13 @@ def assemble_from(dictionary_path, short_geoids=False, dump_raw=False):
     for label, group in groupby(sorted(responses, key=grp_key), key=grp_key):
         
         variable_batches = []
-        for _, data in group:
-            columns, *rows = data
+        for g, data in group:
+            try:
+                columns, *rows = data
+
+            except TypeError:
+                print(f"{label}, {g} missing for some reason.")
+                continue
 
             active_cols = [c for c in columns if c in variable_codes]
             header = active_cols.copy()
