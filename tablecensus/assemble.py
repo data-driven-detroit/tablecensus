@@ -83,14 +83,14 @@ def assemble_from(dictionary_path, short_geoids=False, dump_raw=False):
     grouped_responses = []
     # Group by label for east-west concatenation
     for label, group in groupby(sorted(responses, key=grp_key), key=grp_key):
-        
+
         variable_batches = []
         for g, data in group:
             try:
                 columns, *rows = data
 
             except TypeError:
-                print(f"{label}, {g} missing for some reason.")
+                print(f"{label}, {g} missing from data set, skipping.")
                 continue
 
             active_cols = [c for c in columns if c in variable_codes]
@@ -108,6 +108,10 @@ def assemble_from(dictionary_path, short_geoids=False, dump_raw=False):
             )
 
             variable_batches.append(frame)
+
+        if not variable_batches:
+            print(f"All data missing for {label}, skipping.")
+            continue
 
         grouped_responses.append(
             (label, pd.concat(variable_batches, axis=1).reset_index())
