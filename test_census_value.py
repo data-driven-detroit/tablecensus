@@ -192,18 +192,20 @@ class TestCensusValue:
         cv = CensusValue(123.45, 6.78)
         assert repr(cv) == "CensusValue(123.45)"
     
-    def test_zero_division_by_census_value(self):
+    def test_division_by_zero_census_value_returns_none(self):
         cv1 = CensusValue(100, 10)
         cv2 = CensusValue(0, 2)
-        
-        with pytest.raises(ZeroDivisionError):
-            cv1 / cv2
-    
-    def test_zero_division_by_number(self):
+
+        result = cv1 / cv2
+        assert result.estimate is None
+        assert result.error is None
+
+    def test_division_by_zero_number_returns_none(self):
         cv = CensusValue(100, 10)
-        
-        with pytest.raises(ZeroDivisionError):
-            cv / 0
+
+        result = cv / 0
+        assert result.estimate is None
+        assert result.error is None
     
     def test_negative_estimates(self):
         cv1 = CensusValue(-50, 5, "table1")
