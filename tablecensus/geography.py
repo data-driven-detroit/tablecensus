@@ -12,6 +12,14 @@ from .reference import (
 )
 
 
+MAX_GEOS_PER_CALL = 200
+
+
+def _chunk(lst, n):
+    for i in range(0, len(lst), n):
+        yield lst[i : i + n]
+
+
 @dataclass(eq=True)
 class Geography:
     sum_level: SumLevel
@@ -97,16 +105,15 @@ def create_consolodated_api_calls(tree: defaultdict):
     # You don't need the sumlevel, you just need separate line items in
     # the defaultdict in the CallTree
     for (_, parents), children in tree.items():
-        child_str = ",".join([child.identity for child in children])
-
         match parents:
             case SumLevel():
-                calls.append(
-                    f"for={quote(API_GEO_PARAMS[parents])}:{child_str}"
-                )
+                for chunk in _chunk(list(children), MAX_GEOS_PER_CALL):
+                    child_str = ",".join(c.identity for c in chunk)
+                    calls.append(
+                        f"for={quote(API_GEO_PARAMS[parents])}:{child_str}"
+                    )
 
             case frozenset():
-                child_str = ",".join({child.identity for child in children})
                 ingeos = "%20".join(
                     f"{quote(API_GEO_PARAMS[key])}:{val}"
                     for key, val in parents
@@ -114,10 +121,15 @@ def create_consolodated_api_calls(tree: defaultdict):
 
                 sumlevel = children[0].sum_level
 
-                for_str = f"for={quote(API_GEO_PARAMS[sumlevel])}:{child_str}"
-                in_str = f"in={ingeos}"
+                # De-duplicate identities (prior behavior used a set for
+                # this branch) before chunking so siblings aren't repeated.
+                identities = list({c.identity for c in children})
 
-                calls.append(f"{for_str}&{in_str}")
+                for chunk in _chunk(identities, MAX_GEOS_PER_CALL):
+                    child_str = ",".join(chunk)
+                    for_str = f"for={quote(API_GEO_PARAMS[sumlevel])}:{child_str}"
+                    in_str = f"in={ingeos}"
+                    calls.append(f"{for_str}&{in_str}")
 
             case _:
                 raise TypeError(f"{type(parents)} isn't a valid parent type.")
