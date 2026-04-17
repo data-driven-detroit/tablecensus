@@ -10,6 +10,9 @@ from .reference import (
     SUMLEV_FROM_PARTS,
     API_GEO_PARAMS,
 )
+from .request_prep import chunk
+
+MAX_GEOS_PER_CALL = 100
 
 
 MAX_GEOS_PER_CALL = 200
@@ -105,34 +108,29 @@ def create_consolodated_api_calls(tree: defaultdict):
     # You don't need the sumlevel, you just need separate line items in
     # the defaultdict in the CallTree
     for (_, parents), children in tree.items():
-        match parents:
-            case SumLevel():
-                for chunk in _chunk(list(children), MAX_GEOS_PER_CALL):
-                    child_str = ",".join(c.identity for c in chunk)
+        for batch in chunk(children, MAX_GEOS_PER_CALL):
+            child_str = ",".join([child.identity for child in batch])
+
+            match parents:
+                case SumLevel():
                     calls.append(
                         f"for={quote(API_GEO_PARAMS[parents])}:{child_str}"
                     )
 
-            case frozenset():
-                ingeos = "%20".join(
-                    f"{quote(API_GEO_PARAMS[key])}:{val}"
-                    for key, val in parents
-                )
+                case frozenset():
+                    ingeos = "%20".join(
+                        f"{quote(API_GEO_PARAMS[key])}:{val}"
+                        for key, val in parents
+                    )
+                    sumlevel = batch[0].sum_level
 
-                sumlevel = children[0].sum_level
-
-                # De-duplicate identities (prior behavior used a set for
-                # this branch) before chunking so siblings aren't repeated.
-                identities = list({c.identity for c in children})
-
-                for chunk in _chunk(identities, MAX_GEOS_PER_CALL):
-                    child_str = ",".join(chunk)
                     for_str = f"for={quote(API_GEO_PARAMS[sumlevel])}:{child_str}"
                     in_str = f"in={ingeos}"
+
                     calls.append(f"{for_str}&{in_str}")
 
-            case _:
-                raise TypeError(f"{type(parents)} isn't a valid parent type.")
+                case _:
+                    raise TypeError(f"{type(parents)} isn't a valid parent type.")
 
     return calls
 
