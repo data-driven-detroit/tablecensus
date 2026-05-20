@@ -89,6 +89,26 @@ api_key = "your_api_key_here"
 
 Replace `your_api_key_here` with your actual Census API key. Tablecensus will automatically use this key for all API requests.
 
+#### API Key on Windows
+
+On Windows, the config file goes in your `AppData\Roaming` folder. To get there, paste `%APPDATA%\tablecensus` into the File Explorer address bar and press Enter — Windows will expand it to the full path (e.g. `C:\Users\you\AppData\Roaming\tablecensus`). Create the `tablecensus` folder if it doesn't exist, then create a file inside it called `config.toml` with the following content:
+
+```toml
+[census]
+api_key = "your_api_key_here"
+```
+
+Replace `your_api_key_here` with your actual Census API key.
+
+Alternatively, you can do this in one step from **PowerShell**:
+```powershell
+New-Item -ItemType Directory -Force "$env:APPDATA\tablecensus"
+@"
+[census]
+api_key = "your_api_key_here"
+"@ | Set-Content "$env:APPDATA\tablecensus\config.toml"
+```
+
 ### Mac Users
 
 Users on MAC have to run an additional command to make sure the requests are sent correctly:

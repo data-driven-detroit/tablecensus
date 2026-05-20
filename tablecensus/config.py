@@ -1,19 +1,18 @@
+import os
+import sys
 from pathlib import Path
 import tomllib
 
 
+def _config_path() -> Path:
+    if sys.platform == "win32":
+        base = Path(os.environ.get("APPDATA", Path.home() / "AppData" / "Roaming"))
+        return base / "tablecensus" / "config.toml"
+    return Path.home() / ".config" / "tablecensus" / "config.toml"
+
+
 def get_api_key() -> str:
-    """
-    Read Census API key from config file at ~/.config/tablecensus/config.toml
-
-    Expected config format:
-    [census]
-    api_key = "your_key_here"
-
-    Returns:
-        API key string if found, empty string otherwise
-    """
-    config_path = Path.home() / ".config" / "tablecensus" / "config.toml"
+    config_path = _config_path()
 
     if not config_path.exists():
         return ""
@@ -23,5 +22,4 @@ def get_api_key() -> str:
             config = tomllib.load(f)
             return config.get("census", {}).get("api_key", "")
     except Exception:
-        # If there's any error reading the config, return empty string
         return ""
