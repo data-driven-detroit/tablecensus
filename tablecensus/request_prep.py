@@ -20,7 +20,17 @@ def build_calls(geo_parts, variables, releases):
     )
 
     api_key = get_api_key()
-    key_string = f"&key={api_key}" if api_key else ""
+    if not api_key:
+        from .config import _config_path
+        raise RuntimeError(
+            "No Census API key found.\n\n"
+            f"  Expected config file: {_config_path()}\n\n"
+            "  Create that file with:\n\n"
+            "    [census]\n"
+            '    api_key = "YOUR_KEY"\n\n'
+            "  Get a free key at https://api.census.gov/data/key_signup.html"
+        )
+    key_string = f"&key={api_key}"
 
     return [
         (

@@ -100,30 +100,42 @@ class TestTemplateCreation:
 class TestDataAssembly:
     """Test the core data assembly functionality."""
     
-    @patch('tablecensus.request_manager.populate_data')
-    def test_assemble_from_basic_workflow(self, mock_populate_data, sample_dictionary_file, mock_census_response):
+    @patch('tablecensus.request_prep.get_api_key', return_value='test_key')
+    @patch('tablecensus.assemble.populate_data')
+    def test_assemble_from_basic_workflow(self, mock_populate_data, _, sample_dictionary_file):
         """Test basic assemble_from workflow with mocked API response."""
         mock_populate_data.return_value = [
-            (("Wayne County", 2020, "acs5"), mock_census_response.iloc[:1]),
-            (("Macomb County", 2020, "acs5"), mock_census_response.iloc[1:])
+            (
+                ("for=county:163,099&in=state:26", 2020, "acs5"),
+                [
+                    ["GEO_ID", "NAME", "B01001_001E", "B01001_001M", "B17001_001E", "B17001_001M", "B17001_002E", "B17001_002M", "B19013_001E", "B19013_001M"],
+                    ["0500000US26163", "Wayne County, Michigan", "1749343", "0", "1650000", "5000", "165000", "3000", "45000", "1500"],
+                    ["0500000US26099", "Macomb County, Michigan", "881217", "-5555555555", "830000", "4000", "83000", "2500", "55000", "2000"],
+                ]
+            ),
         ]
-        
+
         result = assemble_from(str(sample_dictionary_file))
-        
-        # Verify result structure
+
         assert isinstance(result, pd.DataFrame)
-        assert len(result) >= 2  # At least two rows (may have multiple years/releases)
-        
-        # Check that calculations were performed
+        assert len(result) >= 2
+
         expected_columns = ["total_population", "poverty_rate", "median_income"]
         for col in expected_columns:
             assert col in result.columns or f"{col}_moe" in result.columns
     
-    @patch('tablecensus.request_manager.populate_data')
-    def test_assemble_command_xlsx_output(self, mock_populate_data, sample_dictionary_file, mock_census_response, temp_dir):
+    @patch('tablecensus.request_prep.get_api_key', return_value='test_key')
+    @patch('tablecensus.assemble.populate_data')
+    def test_assemble_command_xlsx_output(self, mock_populate_data, _, sample_dictionary_file, temp_dir):
         """Test the 'assemble' command with Excel output."""
         mock_populate_data.return_value = [
-            (("Wayne County", 2020, "acs5"), mock_census_response.iloc[:1])
+            (
+                ("for=county:163,099&in=state:26", 2020, "acs5"),
+                [
+                    ["GEO_ID", "NAME", "B01001_001E", "B01001_001M", "B17001_001E", "B17001_001M", "B17001_002E", "B17001_002M", "B19013_001E", "B19013_001M"],
+                    ["0500000US26163", "Wayne County, Michigan", "1749343", "0", "1650000", "5000", "165000", "3000", "45000", "1500"],
+                ]
+            ),
         ]
         
         runner = CliRunner()
@@ -142,11 +154,18 @@ class TestDataAssembly:
         output_data = pd.read_excel(output_file)
         assert len(output_data) > 0
     
-    @patch('tablecensus.request_manager.populate_data')
-    def test_assemble_command_csv_output(self, mock_populate_data, sample_dictionary_file, mock_census_response, temp_dir):
+    @patch('tablecensus.request_prep.get_api_key', return_value='test_key')
+    @patch('tablecensus.assemble.populate_data')
+    def test_assemble_command_csv_output(self, mock_populate_data, _, sample_dictionary_file, temp_dir):
         """Test the 'assemble' command with CSV output."""
         mock_populate_data.return_value = [
-            (("Wayne County", 2020, "acs5"), mock_census_response.iloc[:1])
+            (
+                ("for=county:163,099&in=state:26", 2020, "acs5"),
+                [
+                    ["GEO_ID", "NAME", "B01001_001E", "B01001_001M", "B17001_001E", "B17001_001M", "B17001_002E", "B17001_002M", "B19013_001E", "B19013_001M"],
+                    ["0500000US26163", "Wayne County, Michigan", "1749343", "0", "1650000", "5000", "165000", "3000", "45000", "1500"],
+                ]
+            ),
         ]
         
         runner = CliRunner()
@@ -165,13 +184,20 @@ class TestDataAssembly:
         output_data = pd.read_csv(output_file)
         assert len(output_data) > 0
     
-    @patch('tablecensus.request_manager.populate_data')
-    def test_assemble_command_parquet_output(self, mock_populate_data, sample_dictionary_file, mock_census_response, temp_dir):
+    @patch('tablecensus.request_prep.get_api_key', return_value='test_key')
+    @patch('tablecensus.assemble.populate_data')
+    def test_assemble_command_parquet_output(self, mock_populate_data, _, sample_dictionary_file, temp_dir):
         """Test the 'assemble' command with Parquet output (skip if pyarrow not available)."""
         pytest.importorskip("pyarrow")  # Skip test if pyarrow not available
-        
+
         mock_populate_data.return_value = [
-            (("Wayne County", 2020, "acs5"), mock_census_response.iloc[:1])
+            (
+                ("for=county:163,099&in=state:26", 2020, "acs5"),
+                [
+                    ["GEO_ID", "NAME", "B01001_001E", "B01001_001M", "B17001_001E", "B17001_001M", "B17001_002E", "B17001_002M", "B19013_001E", "B19013_001M"],
+                    ["0500000US26163", "Wayne County, Michigan", "1749343", "0", "1650000", "5000", "165000", "3000", "45000", "1500"],
+                ]
+            ),
         ]
         
         runner = CliRunner()
@@ -272,10 +298,10 @@ class TestErrorHandling:
 class TestComplexCalculations:
     """Test complex calculation scenarios."""
     
-    @patch('tablecensus.request_manager.populate_data')
-    def test_complex_calculations(self, mock_populate_data, temp_dir):
+    @patch('tablecensus.request_prep.get_api_key', return_value='test_key')
+    @patch('tablecensus.assemble.populate_data')
+    def test_complex_calculations(self, mock_populate_data, _, temp_dir):
         """Test that complex calculations work correctly."""
-        # Create dictionary with complex calculations
         complex_dict_data = {
             "Variables": pd.DataFrame({
                 "name": ["poverty_rate", "unemployment_ratio"],
@@ -284,32 +310,24 @@ class TestComplexCalculations:
             "Years": pd.DataFrame({"year": [2020], "release": ["acs5"]}),
             "Geographies": pd.DataFrame({"state": ["26"], "county": ["163"]})
         }
-        
+
         complex_dict_file = temp_dir / "complex_dict.xlsx"
         with pd.ExcelWriter(complex_dict_file, engine='openpyxl') as writer:
             for sheet_name, df in complex_dict_data.items():
                 df.to_excel(writer, sheet_name=sheet_name, index=False)
-        
-        # Mock response with all needed variables
-        mock_response = pd.DataFrame({
-            "GEO_ID": ["0500000US26163"],
-            "NAME": ["Wayne County, Michigan"],
-            "Year": [2020],
-            "Release": ["acs5"],
-            "B17001_001E": [1000], "B17001_001M": [50],
-            "B17001_002E": [100], "B17001_002M": [10],
-            "B23025_001E": [800], "B23025_001M": [40],
-            "B23025_002E": [50], "B23025_002M": [8],
-            "B23025_005E": [30], "B23025_005M": [6]
-        })
-        
+
         mock_populate_data.return_value = [
-            (("Wayne County", 2020, "acs5"), mock_response)
+            (
+                ("for=county:163&in=state:26", 2020, "acs5"),
+                [
+                    ["GEO_ID", "NAME", "B17001_001E", "B17001_001M", "B17001_002E", "B17001_002M", "B23025_001E", "B23025_001M", "B23025_002E", "B23025_002M", "B23025_005E", "B23025_005M"],
+                    ["0500000US26163", "Wayne County, Michigan", "1000", "50", "100", "10", "800", "40", "50", "8", "30", "6"],
+                ]
+            ),
         ]
-        
+
         result = assemble_from(str(complex_dict_file))
-        
-        # Verify calculations were performed and results exist
+
         assert len(result) == 1
         assert "poverty_rate" in result.columns
         assert "unemployment_ratio" in result.columns
